@@ -34,3 +34,11 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+
+    - name: miiror
+      run: |
+        git clone --bare https://github.com/GaetanDu/T-AIA-901_2022_group19.git
+        cd T-AIA-901_2022_group19.git
+        git push --mirror https://github.com/EpitechMscPro2020/T-AIA-901_2022_group19.git
+        cd ..
+        rm -f T-AIA-901_2022_group19.git
