@@ -33,9 +33,9 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest
+        pytest .
 
-    - name: miiror
+    - name: mirror
       run: |
         git clone --bare https://github.com/GaetanDu/T-AIA-901_2022_group19.git
         cd T-AIA-901_2022_group19.git
