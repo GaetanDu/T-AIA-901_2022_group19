@@ -1,0 +1,3 @@
+pas forcement faire un reseau de neuronne 
+on peut utiliser les lib par exemple google speech et justifier
+nlp?
