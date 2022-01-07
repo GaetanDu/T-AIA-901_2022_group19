@@ -5,7 +5,6 @@ import srsly
 from pathlib import Path
 
 import spacy
-from spacy.kb import KnowledgeBase
 from spacy.language import Language
 from spacy.matcher import Matcher, DependencyMatcher, PhraseMatcher
 from spacy.tokens import Token, Span
@@ -59,8 +58,9 @@ def main(path_departure: Path, path_destination: Path, path_steps: Path, vectors
 
     # First: create a simple model from a model
     nlp = spacy.load("fr_core_news_md")
+    # Add component to the pipeline
     nlp.add_pipe('language_detector', last=True)
-    nlp.add_pipe("flag_loc", last=True)  # Add component to the pipeline
+    nlp.add_pipe("flag_loc", last=True)
     nlp.to_disk(nlp_dir)
 
 

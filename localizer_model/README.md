@@ -1,10 +1,8 @@
-<a href="https://www.youtube.com/watch?v=8u57WSXVpmw" target="_blank"><img src="https://user-images.githubusercontent.com/13643239/81293769-216fd180-906e-11ea-9f9c-d9dec9163dcc.png" width="300" height="auto" align="right" /></a>
-
 <!-- SPACY PROJECT: AUTO-GENERATED DOCS START (do not remove) -->
 
-# 🪐 spaCy Project: Disambiguation of "Emerson" mentions in sentences (Entity Linking)
+# 🪐 spaCy Project: Classification of locations as destination and departure
 
-**This project was created as part of a [step-by-step video tutorial](https://www.youtube.com/watch?v=8u57WSXVpmw).** It uses [spaCy](https://spacy.io)'s entity linking functionality and [Prodigy](https://prodi.gy) to disambiguate "Emerson" mentions in text to unique identifiers from Wikidata. As an example use-case, we consider three different people called Emerson: [an Australian tennis player](https://www.wikidata.org/wiki/Q312545), [an American writer](https://www.wikidata.org/wiki/Q48226), and a [Brazilian footballer](https://www.wikidata.org/wiki/Q215952). [See here](https://github.com/explosion/projects/tree/master/nel-emerson) for the previous scripts for spaCy v2.x.
+**This project was created as part of a epitech project T-AIA-901.
 
 ## 📋 project.yml
 
@@ -20,10 +18,9 @@ Commands are only re-run if their inputs have changed.
 
 | Command | Description |
 | --- | --- |
-| `download` | Download a spaCy model with pretrained vectors and NER component |
-| `kb` | Create the Knowledge Base in spaCy and write it to file |
+| `download` | downloadthe french vectors language |
+| `assemble` | assemble a spaCy model with pretrained vectors, a regex matcher and a language detector component |
 | `corpus` | Create a training and dev set from the manually annotated data |
-| `train` | Train a new Entity Linking component |
 | `evaluate` | Final evaluation on the dev data and printing the results |
 | `setup` | Install dependencies |
 | `clean` | Remove intermediate files |
@@ -37,8 +34,7 @@ inputs have changed.
 
 | Workflow | Steps |
 | --- | --- |
-| `all` | `setup` &rarr; `download` &rarr; `kb` &rarr; `corpus` &rarr; `train` &rarr; `evaluate` |
-| `training` | `kb` &rarr; `corpus` &rarr; `train` &rarr; `evaluate` |
+| `all` | `setup` &rarr; `download` &rarr;  `assemble` &rarr; `corpus` &rarr; `evaluate` |
 
 ### 🗂 Assets
 
@@ -48,33 +44,9 @@ in the project directory.
 
 | File | Source | Description |
 | --- | --- | --- |
-| [`assets/emerson_annotated_text.jsonl`](assets/emerson_annotated_text.jsonl) | Local | The annotated data |
-| [`assets/entities.csv`](assets/entities.csv) | Local | The entities in the knowledge base |
-| [`assets/emerson_input_text.txt`](assets/emerson_input_text.txt) | Local | The original input text |
+| [`assets/patterns_destination.jsonl`](assets/patterns_destination.jsonl) | Local | The patterns for destination locations |
+| [`assets/patterns_departure.jsonl`](assets/entities.csv) | Local | The patterns for departure locations |
+| [`assets/patterns_step.jsonl`](assets/patterns_step.txt) | Local | The patterns for step locations |
+| [`assets/data.csv`](assets/data.csv) | Local | The labelled data |
 
 <!-- SPACY PROJECT: AUTO-GENERATED DOCS END (do not remove) -->
-
-## Prodigy annotation
-
-To perform the manual annotation in Prodigy, we have written a custom recipe
-[`el_recipe.py`](scripts/el_recipe.py).
-
-As input, we need to provide the Knowledge base `my_kb` and NER pipeline
-`my_nlp` that are created with the scripts described in the previous section.
-Further, the file [`emerson_input_text.txt`](prodigy/emerson_input_text) lists
-30 sentences from Wikipedia containing just the mention "Emerson" and not the
-full name. These sentences are then annotated with Prodigy by executing the
-command
-
-```bash
-prodigy entity_linker.manual emersons_annotated emerson_input_text.txt my_nlp/ my_kb entitites.csv -F el_recipe.py
-```
-
-The final results are stored to file with
-
-```bash
-prodigy db-out emersons_annotated >> emerson_annotated_text.jsonl
-```
-
-This JSONL file is included here as well in the [`assets`](assets) subdirectory
-so the scripts can be run without having to (re)do this manual annotation.
