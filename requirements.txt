@@ -1,7 +1,9 @@
 numpy
-scipy
+spacy
 scikit-learn
 tensorflow
 matplotlib
 plotly
 pylint
+spacy-langdetect
+pyaudio

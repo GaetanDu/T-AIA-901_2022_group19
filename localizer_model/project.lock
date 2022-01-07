@@ -1,0 +1,37 @@
+download:
+  cmd: python -m spacy run download
+  script:
+    - python -m spacy download fr_core_news_md
+  deps: []
+  outs: []
+  spacy_version: 3.2.0
+  spacy_git_version: 0fc3dee77
+assemble:
+  cmd: python -m spacy run assemble
+  script:
+    - python ./scripts/create_matcher_model.py ./assets/patterns_destination.jsonl
+      ./assets/patterns_departure.jsonl ./assets/patterns_steps.jsonl fr_core_news_md
+      temp/my_nlp
+  deps: []
+  outs:
+    - path: temp/my_nlp
+      md5: 4020e1bf55faecb59a592ef67cdca535
+    - path: scripts/create_matcher_model.py
+      md5: aabc145bcd44b021f8da5119087565f6
+  spacy_version: 3.2.0
+  spacy_git_version: 0fc3dee77
+corpus:
+  cmd: python -m spacy run corpus
+  script:
+    - python ./scripts/create_corpus.py 0.8 ./assets/data.csv ./temp/my_nlp/ corpus/train.spacy
+      corpus/dev.spacy
+  deps:
+    - path: assets/data.csv
+      md5: d11beebc0a1af0495eeb08da9d6a009a
+  outs:
+    - path: corpus/train.spacy
+      md5: 9593fb8c0c657e2904c4d26e0cf4caca
+    - path: corpus/dev.spacy
+      md5: 1f1e85b7483cf40b3a29557ab7484254
+  spacy_version: 3.2.0
+  spacy_git_version: 0fc3dee77
