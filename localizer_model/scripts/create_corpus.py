@@ -14,15 +14,15 @@ def main(perc_training: float, csv_loc: Path, nlp_dir: Path, train_corpus: Path,
     gold_ids = []
     data = pd.read_csv(csv_loc, encoding='latin3')
     for idx, example in data.iterrows():
-        sentence = example["TEXT"]
+        sentence = example["TEXT"].lower()
         doc = nlp(sentence)
         new_ents = []
         for ent in doc.ents:
-            if ent.text in example['DESTINATION']:
+            if ent.text == example['DESTINATION'].lower():
                 new_ents.append(Span(doc, ent.start, ent.end, label='DESTINATION'))
-            elif ent.text in example['DEPARTURE']:
+            elif ent.text == example['DEPARTURE'].lower():
                 new_ents.append(Span(doc, ent.start, ent.end, label='DEPARTURE'))
-            elif ent.text in str(example['STEP']):
+            elif ent.text in str(example['STEP']).lower():
                 new_ents.append(Span(doc, ent.start, ent.end, label='STEP'))
             else:
                 new_ents.append(ent)

@@ -11,27 +11,99 @@ assemble:
   script:
     - python ./scripts/create_matcher_model.py ./assets/patterns_destination.jsonl
       ./assets/patterns_departure.jsonl ./assets/patterns_steps.jsonl fr_core_news_md
-      temp/my_nlp
+      temp/nlp_regex
   deps: []
   outs:
-    - path: temp/my_nlp
+    - path: temp/nlp_regex
       md5: 4020e1bf55faecb59a592ef67cdca535
     - path: scripts/create_matcher_model.py
-      md5: aabc145bcd44b021f8da5119087565f6
+      md5: afd29364546c2b97b943a2cb88768186
   spacy_version: 3.2.0
   spacy_git_version: 0fc3dee77
 corpus:
   cmd: python -m spacy run corpus
   script:
-    - python ./scripts/create_corpus.py 0.8 ./assets/data.csv ./temp/my_nlp/ corpus/train.spacy
+    - python ./scripts/create_corpus.py 0.8 ./assets/data.csv ./temp/nlp_regex/ corpus/train.spacy
       corpus/dev.spacy
   deps:
     - path: assets/data.csv
-      md5: d11beebc0a1af0495eeb08da9d6a009a
+      md5: 6be05b8fbea248b6776e63c33362443a
   outs:
     - path: corpus/train.spacy
-      md5: 9593fb8c0c657e2904c4d26e0cf4caca
+      md5: 15e2e5b29cad42076e4e1d1620ee1fb0
     - path: corpus/dev.spacy
-      md5: 1f1e85b7483cf40b3a29557ab7484254
+      md5: 187ee2d50d9e78a7c81844df54a6daf8
+  spacy_version: 3.2.0
+  spacy_git_version: 0fc3dee77
+package:
+  cmd: python -m spacy run package
+  script:
+    - python -m spacy package ./temp/nlp_regex ./packages --code scripts/create_matcher_model.py
+  deps:
+    - path: requirements.txt
+      md5: 48da8bc17629db396d3dc78e8fc4d8cc
+  outs: []
+  spacy_version: 3.2.0
+  spacy_git_version: 0fc3dee77
+evaluate:
+  cmd: python -m spacy run evaluate
+  script:
+    - python -m spacy evaluate temp/nlp_xgb/ corpus/dev.spacy --output metrics.json
+      --code  ./scripts/create_xgboost_model.py
+  deps:
+    - path: corpus/dev.spacy
+      md5: 02c8ebda81c2ecc626782b966eb476f5
+  outs:
+    - path: metrics.json
+      md5: 25fff130aa7d7bac5c9194d411796a0a
+  spacy_version: 3.2.1
+  spacy_git_version: 800737b41
+setup:
+  cmd: python -m spacy run setup
+  script:
+    - python -m pip install -r requirements.txt
+  deps:
+    - path: requirements.txt
+      md5: 48da8bc17629db396d3dc78e8fc4d8cc
+  outs: []
+  spacy_version: 3.2.0
+  spacy_git_version: 0fc3dee77
+assemble_xgb:
+  cmd: python -m spacy run assemble_xgb
+  script:
+    - python ./scripts/create_xgboost_model.py corpus/train.spacy fr_core_news_md
+      temp/nlp_xgb
+  deps: []
+  outs:
+    - path: temp/nlp_xgb
+      md5: 3ab4e1fe4cddf3a70cc74ee9072f3cea
+    - path: scripts/create_xgboost_model.py
+      md5: bfc2c5c40ecff94d1c8be3ba3e58f663
+  spacy_version: 3.2.0
+  spacy_git_version: 0fc3dee77
+evaluate_regex:
+  cmd: python -m spacy run evaluate_regex
+  script:
+    - python -m spacy evaluate temp/nlp_regex/ corpus/dev.spacy --output metrics_regex.json
+      --code  ./scripts/create_matcher_model.py
+  deps:
+    - path: corpus/dev.spacy
+      md5: 187ee2d50d9e78a7c81844df54a6daf8
+  outs:
+    - path: metrics_regex.json
+      md5: 79a176cbc5cac6a1d7b1146a0686c0d4
+  spacy_version: 3.2.0
+  spacy_git_version: 0fc3dee77
+evaluate_xgb:
+  cmd: python -m spacy run evaluate_xgb
+  script:
+    - python -m spacy evaluate temp/nlp_xgb/ corpus/dev.spacy --output metrics_xgb.json
+      --code  ./scripts/create_xgboost_model.py
+  deps:
+    - path: corpus/dev.spacy
+      md5: 187ee2d50d9e78a7c81844df54a6daf8
+  outs:
+    - path: metrics_xgb.json
+      md5: f1c20df830d97de6038da00a84575223
   spacy_version: 3.2.0
   spacy_git_version: 0fc3dee77

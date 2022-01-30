@@ -5,5 +5,5 @@ tensorflow
 matplotlib
 plotly
 pylint
-spacy-langdetect
+spacy-language-detection
 pyaudio

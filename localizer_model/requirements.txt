@@ -1,1 +1,3 @@
-google-cloud-storage
+spacy
+spacy-language-detection
+xgboost

@@ -9,7 +9,8 @@ vars:
   patterns_departure: "patterns_departure.jsonl"
   patterns_steps: "patterns_steps.jsonl"
   annotations: "data.csv"
-  nlp: "my_nlp"
+  nlp_regex: "nlp_regex"
+  nlp_xgb: "nlp_xgb"
   train: "train"
   dev: "dev"
   version: "0.0.1"
@@ -26,8 +27,10 @@ workflows:
     - setup
     - download
     - corpus
-    - evaluate
-    - clean
+    - assemble
+    - assemble_xgb
+    - evaluate_regex
+    - evaluate_xgb
 
 # Project commands, specified in a style similar to CI config files (e.g. Azure
 # pipelines). The name is the command name that lets you trigger the command
@@ -38,34 +41,50 @@ commands:
     help: "Download a spaCy model with pretrained vectors"
     script:
       - "python -m spacy download ${vars.vectors_model}"
-      
+
   - name: assemble
     help: "Build one version of the pipeline."
     script:
-      - "python ./scripts/create_matcher_model.py ./assets/${vars.patterns_destination} ./assets/${vars.patterns_departure} ./assets/${vars.patterns_steps} ${vars.vectors_model} temp/${vars.nlp}"
+      - "python ./scripts/create_matcher_model.py ./assets/${vars.patterns_destination} ./assets/${vars.patterns_departure} ./assets/${vars.patterns_steps} ${vars.vectors_model} temp/${vars.nlp_regex}"
     outputs_no_cache:
-      - "temp/${vars.nlp}"
+      - "temp/${vars.nlp_regex}"
       - "scripts/create_matcher_model.py"
+      
+  - name: assemble_xgb
+    help: "Build one version of the pipeline."
+    script:
+      - "python ./scripts/create_xgboost_model.py corpus/${vars.train}.spacy ${vars.vectors_model} temp/${vars.nlp_xgb}"
+    outputs_no_cache:
+      - "temp/${vars.nlp_xgb}"
+      - "scripts/create_xgboost_model.py"
 
   - name: corpus
     help: "Create a training and dev set from the manually annotated data"
     script:
-      - "python ./scripts/create_corpus.py 0.8 ./assets/${vars.annotations} ./temp/${vars.nlp}/ corpus/${vars.train}.spacy corpus/${vars.dev}.spacy"
+      - "python ./scripts/create_corpus.py 0.8 ./assets/${vars.annotations} ./temp/${vars.nlp_regex}/ corpus/${vars.train}.spacy corpus/${vars.dev}.spacy"
     deps:
       - "assets/${vars.annotations}"
     outputs_no_cache:
       - "corpus/${vars.train}.spacy"
       - "corpus/${vars.dev}.spacy"
       
-  - name: evaluate
+  - name: evaluate_regex
     help: "Evaluate the model and export metrics"
     script:
-      - "python -m spacy evaluate package/ corpus/${vars.dev}.spacy --output evaluate/metrics.json"
+      - "python -m spacy evaluate temp/${vars.nlp_regex}/ corpus/${vars.dev}.spacy --output metrics_regex.json --code  ./scripts/create_matcher_model.py"
     deps:
       - "corpus/${vars.dev}.spacy"
-      - "temp/my_nlp"
     outputs:
-      - "evaluate/metrics.json"
+      - "metrics_regex.json"
+
+  - name: evaluate_xgb
+    help: "Evaluate the model and export metrics"
+    script:
+      - "python -m spacy evaluate temp/${vars.nlp_xgb}/ corpus/${vars.dev}.spacy --output metrics_xgb.json --code  ./scripts/create_xgboost_model.py"
+    deps:
+      - "corpus/${vars.dev}.spacy"
+    outputs:
+      - "metrics_xgb.json"
       
   - name: setup
     help: Install dependencies
@@ -73,9 +92,3 @@ commands:
       - "python -m pip install -r requirements.txt"
     deps:
       - "requirements.txt"
-
-  - name: clean
-    help: "Remove intermediate files"
-    script:
-      - "del corpus/*"
-      - "del temp/*"
