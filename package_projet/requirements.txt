@@ -1,0 +1,6 @@
+numpy
+spacy
+pylint
+spacy-language-detection
+scikit-network
+speech_recognition
