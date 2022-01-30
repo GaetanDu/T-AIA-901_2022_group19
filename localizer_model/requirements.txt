@@ -1,3 +1,0 @@
-spacy
-spacy-language-detection
-xgboost

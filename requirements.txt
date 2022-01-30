@@ -1,9 +1,0 @@
-numpy
-spacy
-scikit-learn
-tensorflow
-matplotlib
-plotly
-pylint
-spacy-language-detection
-pyaudio
